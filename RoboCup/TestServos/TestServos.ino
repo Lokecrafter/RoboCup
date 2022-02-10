@@ -20,15 +20,20 @@ void setup(){
 
 void loop(){
 
-    driveServos(-0.15, 0.15);
+    driveServos(-0.15, 0.15, 1);
     delay(1000);
-    driveServos(0.15, -0.15);
+    driveServos(0.15, -0.15, 1);
+    delay(1000);
+    driveServos(1, 1, 0.15);
     delay(1000);
 }
 
-void driveServos(float leftPercentage, float rightPercentage){
-    int left = floatMap(leftPercentage, -1, 1, 180, 0);
-    int right = floatMap(rightPercentage, -1, 1, 0, 180);
+void driveServos(float leftPercentage, float rightPercentage, float speedMultiplier){
+    leftPercentage *= speedMultiplier;
+    rightPercentage *= speedMultiplier;
+
+    int left = floatMap(rightPercentage, -1, 1, 0, 180);
+    int right = floatMap(leftPercentage, -1, 1, 180, 0);
 
     servoLeft.write(left);
     servoRight.write(right);

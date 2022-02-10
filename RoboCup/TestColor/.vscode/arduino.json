@@ -1,0 +1,7 @@
+{
+    "sketch": "TestServos.ino",
+    "configuration": "cpu=atmega2560",
+    "board": "arduino:avr:mega",
+    "port": "COM9",
+    "programmer": "arduino:avrisp"
+}
