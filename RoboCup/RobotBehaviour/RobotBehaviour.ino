@@ -4,30 +4,30 @@
 //Pins
 #define SERVOPINL 10
 #define SERVOPINR 9
+#define ENABLEPIN 23
 
 
 Servo servoLeft;
 Servo servoRight;
 
-const int photoResistors[] = {A6, A7, A0, A1, A2, A3, A4, A5, A9, A8};
 const byte numPhotoResistors = 10;
-
-int baseValues[numPhotoResistors];
-int finValues[numPhotoResistors];
+const int photoResistors[] = {A8, A9, A0, A1, A2, A3, A4, A5, A7, A6};
+int baseValues[] = {287,261,225,390,271,475,470,252,289,175};
+int finValues[]  = {515,420,300,571,415,698,612,342,480,319};
 
 Vector2 photoPositions[] = { 
     Vector2(-4.5,-1), 
-    Vector2(-3.5,-0.5), 
+    Vector2(-3.5,0),
 
-    Vector2(-2.5,0), 
-    Vector2(-1.5,0), 
-    Vector2(-0.5,0), 
-    Vector2(0.5,0), 
-    Vector2(1.5,0), 
-    Vector2(2.5,0), 
+    Vector2(-2.5,1), 
+    Vector2(-1.5,1), 
+    Vector2(-0.5,1), 
+    Vector2(0.5,1), 
+    Vector2(1.5,1), 
+    Vector2(2.5,1),  
 
-    Vector2(3.5,0.5),
-    Vector2(4.5,1)
+    Vector2(3.5,0),
+    Vector2(4.5,-1)
 };
 
 void driveServos(Vector2* vect, float speedMultiplier);
@@ -37,30 +37,27 @@ void setup(){
     servoRight.attach(SERVOPINR);
     servoLeft.write(90);
     servoRight.write(90);
+    pinMode(ENABLEPIN, INPUT_PULLUP);
 
-    //Calibrate white and black values
-    for(byte i = 0; i < numPhotoResistors; i++){
-        pinMode(photoResistors[i], INPUT);
-    }
-    delay(50);
-    for(byte i = 0; i < numPhotoResistors; i++){
-        baseValues[i] = analogRead(photoResistors[i]);
-    }
-    delay(5000);
-    for(byte i = 0; i < numPhotoResistors; i++){
-        finValues[i] = analogRead(photoResistors[i]);
-    }
     Serial.begin(9600);
 }
 
 
 void loop(){
-    Serial.println(calcLineMiddle().x, 4);
+    //Serial.println(calcLineMiddle().x);
 
-    Vector2 vect = calcLineMiddle() * -1;
+    Vector2 vect = calcLineMiddle();
+    vect.x = vect.x * -1;
+    Serial.print(vect.x);
+    Serial.print("   ");
+    Serial.println(vect.y);
 
-    driveServos(vect, 0.1);
-    delay(50);
+    if(digitalRead(ENABLEPIN) == LOW) driveServos(vect, 0.1);
+    else{
+      servoLeft.write(90);
+      servoRight.write(90);
+    }
+    //delay(50);
 }
 /*
 void driveServos(float leftPercentage, float rightPercentage, float speedMultiplier){
@@ -79,7 +76,8 @@ void driveServos(Vector2 &vect, float speedMultiplier){
 
     vect = vect * speedMultiplier;
 
-    if(vect.y < 0)  vect.y = vect.y * -1; //Handles steering so it feels natural when robot is reversing. With this if-statement it simulates how a car would steer when reversing
+    //Only when using a controller
+    //if(vect.y < 0)  vect.y = vect.y * -1; //Handles steering so it feels natural when robot is reversing. With this if-statement it simulates how a car would steer when reversing
 
     float leftPercentage = vect.y + vect.x;
     float rightPercentage = vect.y - vect.x;

@@ -1,9 +1,10 @@
-const int photoResistors[] = {A0, A1, A2, A3, A4, A5};
-int baseValues[] = {0,0,0,0,0,0};
-int finValues[] = {0,0,0,0,0,0};
-const byte numPhotoResistors = 6;
+const byte numPhotoResistors = 10;
+const int photoResistors[] = {A6, A7, A0, A1, A2, A3, A4, A5, A9, A8};
+int baseValues[numPhotoResistors];
+int finValues[numPhotoResistors];
 
 void setup(){
+    Serial.begin(9600);
     for(byte i = 0; i < numPhotoResistors; i++){
         pinMode(photoResistors[i], INPUT);
     }
@@ -15,7 +16,6 @@ void setup(){
     for(byte i = 0; i < numPhotoResistors; i++){
         finValues[i] = analogRead(photoResistors[i]);
     }
-    Serial.begin(9600);
 }
 
 void loop (){
