@@ -5,6 +5,8 @@
 #define SERVOPINL 10
 #define SERVOPINR 9
 #define ENABLEPIN 23
+#define TRIGPIN 30
+#define ECHOPIN 32
 
 
 Servo servoLeft;
@@ -14,6 +16,7 @@ const byte numPhotoResistors = 10;
 const int photoResistors[] = {A8, A9, A0, A1, A2, A3, A4, A5, A7, A6};
 int baseValues[] = {287,261,225,390,271,475,470,252,289,175};
 int finValues[]  = {515,420,300,571,415,698,612,342,480,319};
+float avoidDistance = 15;
 
 Vector2 photoPositions[] = { 
     Vector2(-4.5,-1), 
@@ -38,6 +41,8 @@ void setup(){
     servoLeft.write(90);
     servoRight.write(90);
     pinMode(ENABLEPIN, INPUT_PULLUP);
+    pinMode(TRIGPIN, OUTPUT);
+    pinMode(ECHOPIN, INPUT);
 
     Serial.begin(9600);
 }
@@ -48,9 +53,12 @@ void loop(){
 
     Vector2 vect = calcLineMiddle();
     vect.x = vect.x * -1;
+    /*
     Serial.print(vect.x);
     Serial.print("   ");
     Serial.println(vect.y);
+    */
+    if(getUltrasonicDistance(TRIGPIN, ECHOPIN) < avoidDistance) vect = vect * -1;
 
     if(digitalRead(ENABLEPIN) == LOW) driveServos(vect, 0.1);
     else{
@@ -103,6 +111,23 @@ Vector2 calcLineMiddle(){
   if(valSum == 0) return Vector2(0,0);
   return(sum / valSum);
 }
+float getUltrasonicDistance(int trigPin, int echoPin){
+    digitalWrite(trigPin, LOW);
+    delayMicroseconds(2);
+
+    digitalWrite(trigPin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trigPin, LOW);
+
+    float duration = pulseIn(echoPin, HIGH, 5000);
+
+    if(duration == 0){
+      duration = 100000000000; //Absurdley large number to make next calculation very large 
+    }
+    float distance = duration * 0.034 / 2;
+    Serial.println(distance);
+    return distance;
+    }
 
 float floatMap(float x, float in_min, float in_max, float out_min, float out_max) {
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;

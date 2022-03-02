@@ -1,5 +1,5 @@
 {
-    "sketch": "TestPhotoResistors.ino",
+    "sketch": "GraphPhotoResistors.ino",
     "configuration": "cpu=atmega2560",
     "board": "arduino:avr:mega",
     "port": "COM9",
