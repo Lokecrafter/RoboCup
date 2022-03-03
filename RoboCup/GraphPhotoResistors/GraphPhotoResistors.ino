@@ -24,6 +24,7 @@ void loop (){
     Serial.print(mappedVal);*/
     Serial.print(val);
     Serial.print("   ");
+    
   }
   Serial.println("");
   delay(50);

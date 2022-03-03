@@ -1,5 +1,5 @@
 {
-    "sketch": "RoboCup\\TestPhotoResistors\\TestPhotoResistors.ino",
+    "sketch": "RoboCup\\GraphPhotoResistors\\GraphPhotoResistors.ino",
     "configuration": "cpu=atmega2560",
     "board": "arduino:avr:mega",
     "port": "COM9",
