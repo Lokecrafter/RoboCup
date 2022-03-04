@@ -12,6 +12,8 @@
 Servo servoLeft;
 Servo servoRight;
 
+float followLineThreshold = 0.7;  //Threshold for check if robot shpuld follow line oe continue forward
+
 const byte numPhotoResistors = 10;
 const int photoResistors[] = {A8, A9, A0, A1, A2, A3, A4, A5, A7, A6};
 //Försök 1 Teknikum
@@ -91,18 +93,18 @@ void loop(){
 
     Vector2 vect = calcLineMiddle();
     vect.x = vect.x * -1;
-    
+    /*
     Serial.print(vect.x);
     Serial.print("   ");
     Serial.println(vect.y);
-    
+    */
     //if(getUltrasonicDistance(TRIGPIN, ECHOPIN) < avoidDistance) vect.y = vect.y * -1;
 
 
     
     
     //if(getUltrasonicDistance(TRIGPIN, ECHOPIN) < avoidDistance) driveAround();
-    driveServos(vect, 0.2);
+    driveServos(vect, 0.15);
     //delay(50);
 }
 /*
@@ -120,7 +122,7 @@ void driveServos(Vector2 &vect, float speedMultiplier){
     vect.x = clamp(vect.x, -1, 1);
     vect.y = clamp(vect.y, -1, 1);
 
-    vect = vect * speedMultiplier;
+    vect = vect * (speedMultiplier);
 
     //Only when using a controller
     //if(vect.y < 0)  vect.y = vect.y * -1; //Handles steering so it feels natural when robot is reversing. With this if-statement it simulates how a car would steer when reversing
@@ -161,6 +163,8 @@ Vector2 calcLineMiddle(){
           	index = i;
         }
     }
+    Serial.println(maxVal);
+    if(maxVal <= followLineThreshold) return Vector2(0,1);
 	return(photoPositions[index]);
 }
 float getUltrasonicDistance(int trigPin, int echoPin){
