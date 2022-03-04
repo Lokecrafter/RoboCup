@@ -1,4 +1,4 @@
-
+#include<Arduino.h>
 class Vector2
 {
     public:
@@ -38,5 +38,29 @@ class Vector2
             float length = sqrt(x*x + y*y);
             x /= length;
             y /= length;
+        }
+};
+class VectorP
+{
+    public:
+        float angle = 0;
+        float length = 0;
+
+        VectorP(float newAngle, float newLength){
+            angle = newAngle;
+            length = newLength;
+        }
+        VectorP operator * (float const &factor) {
+            return VectorP(angle, length * factor);
+        }
+        VectorP operator / (float const &factor) {
+            return VectorP(angle, length / factor);
+        }
+        Vector2 ToVector2(){
+            return Vector2(cos(angle), sin(angle)) * length;
+        }
+
+        void normalize(){
+            length = 1;
         }
 };
