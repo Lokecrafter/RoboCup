@@ -19,7 +19,7 @@ class LineFinder {
         void SetNumPhotoResistors(int newNum){numPhotoResistors = newNum;}
         void SetThreshold(float newThreshold){threshold = newThreshold;}
         void SetPhotoResistors(int* newPins){
-            delete [] photoResistors;
+            //delete [] photoResistors;
             photoResistors = newPins;
         }
         void SetWhiteVals(int* newVals){
@@ -73,6 +73,12 @@ class LineFinder {
         }
 };
 
+
+
+
+
+
+
 #include<Servo.h>
 class MotorController{
     private:
@@ -88,6 +94,13 @@ class MotorController{
             return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
         }
     public:
+        MotorController(int leftServoPin, int rightServoPin){
+            servoLeft.attach(leftServoPin);
+            servoRight.attach(rightServoPin);
+            servoLeft.write(90);
+            servoRight.write(90);
+        }
+
         void driveServos(Vector2 &vect, float speedMultiplier){
             vect.x = clamp(vect.x, -1, 1);
             vect.y = clamp(vect.y, -1, 1);
