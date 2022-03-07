@@ -30,9 +30,12 @@ class LineFinder {
             delete [] blackVals;
             blackVals = newVals;
         }
-        void SetAngles(VectorP* newAngles){
+        void SetAngles(VectorP* newAngles){ //Give angles in degrees
             delete [] photoAngles;
             photoAngles = newAngles;
+            for(int i = 0; i < numPhotoResistors; i++){
+                photoAngles[i].angle *= PI / 180;
+            }
         }
 
         //Constructor & Destructor
@@ -120,5 +123,37 @@ class MotorController{
 
             servoLeft.write(left);
             servoRight.write(right);
+        }
+};
+
+
+
+
+class UltraSonicSensor{
+    private:
+        int trigPin;
+        int echoPin;
+    public:
+        UltraSonicSensor(int newTrigPin, int newEchoPin){
+            trigPin = newTrigPin;
+            echoPin = newEchoPin;
+        }
+
+        float getDistance(){
+            digitalWrite(trigPin, LOW);
+            delayMicroseconds(2);
+
+            digitalWrite(trigPin, HIGH);
+            delayMicroseconds(10);
+            digitalWrite(trigPin, LOW);
+
+            float duration = pulseIn(echoPin, HIGH, 5000);
+
+            if(duration == 0){
+            duration = 100000000000; //Absurdley large number to make next calculation very large 
+            }
+            float distance = duration * 0.034 / 2;
+            Serial.println(distance);
+            return distance;
         }
 };
