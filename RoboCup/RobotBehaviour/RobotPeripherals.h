@@ -70,9 +70,18 @@ class LineFinder {
                     index = i;
                 }
             }
-            Serial.println(maxVal);
+            //Return the vector pointing straight forward if none of photo resistors are black enough
             if(maxVal <= threshold) return VectorP(PI * 0.5,1);
-            return(photoAngles[index]);
+
+            //Calculate neighbour average
+            float avrgAngle = 0;
+            if(index <= 0)
+                avrgAngle = (photoAngles[0].angle + photoAngles[0].angle + photoAngles[1].angle) / 3;
+            else if(index >= numPhotoResistors - 1)
+                avrgAngle = (photoAngles[numPhotoResistors - 2].angle + photoAngles[numPhotoResistors - 1].angle + photoAngles[numPhotoResistors - 1].angle) / 3;
+            else
+                avrgAngle = (photoAngles[index - 1].angle + photoAngles[index].angle + photoAngles[index + 1].angle) / 3;
+            return(VectorP(avrgAngle, 1));
         }
 };
 
