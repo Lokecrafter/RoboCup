@@ -2,6 +2,6 @@
     "sketch": "RobotBehaviour.ino",
     "configuration": "cpu=atmega2560",
     "board": "arduino:avr:mega",
-    "port": "COM9",
+    "port": "COM13",
     "programmer": "arduino:avrisp"
 }
