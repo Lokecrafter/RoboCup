@@ -56,12 +56,11 @@ class LineFinder {
             blackVals = nullptr;
             photoAngles = nullptr;
         }
-
         //Methods
         VectorP calcLineMiddle(){
-            //Find max value
             int index = 0;
             float maxVal = 0;
+            //Find max value
             for(byte i = 0; i < numPhotoResistors; i++){
                 float val = (float)analogRead(photoResistors[i]);
                 val = floatMap(val, whiteVals[i], blackVals[i], 0, 1);
@@ -75,12 +74,32 @@ class LineFinder {
 
             //Calculate neighbour average
             float avrgAngle = 0;
-            if(index <= 0)
-                avrgAngle = (photoAngles[0].angle + photoAngles[0].angle + photoAngles[1].angle) / 3;
-            else if(index >= numPhotoResistors - 1)
-                avrgAngle = (photoAngles[numPhotoResistors - 2].angle + photoAngles[numPhotoResistors - 1].angle + photoAngles[numPhotoResistors - 1].angle) / 3;
-            else
-                avrgAngle = (photoAngles[index - 1].angle + photoAngles[index].angle + photoAngles[index + 1].angle) / 3;
+            float sumValues = 0;
+            for(int i = index - 1; i < index + 2; i++){
+                //Handles exeptions when i is outide of array. Currently it adds the closest index inside the array to the total average angle
+                if(i < 0){
+                    float val = (float)analogRead(photoResistors[0]);
+                    val = floatMap(val, whiteVals[0], blackVals[0], 0, 1);
+                    sumValues += val;
+
+                    avrgAngle += photoAngles[0].angle * val;
+                }
+                else if(i > numPhotoResistors - 1){
+                    float val = (float)analogRead(photoResistors[numPhotoResistors - 1]);
+                    val = floatMap(val, whiteVals[numPhotoResistors - 1], blackVals[numPhotoResistors - 1], 0, 1);
+                    sumValues += val;
+
+                    avrgAngle += photoAngles[numPhotoResistors - 1].angle;
+                }
+                else{
+                    float val = (float)analogRead(photoResistors[i]);
+                    val = floatMap(val, whiteVals[i], blackVals[i], 0, 1);
+                    sumValues += val * val;
+
+                    avrgAngle += photoAngles[i].angle * val;
+                }
+            }
+            avrgAngle /= sumValues; //Definition for center of mass equation, exept this time it's a center of value equation
             return(VectorP(avrgAngle, 1));
         }
 };
@@ -159,7 +178,8 @@ class UltraSonicSensor{
             float duration = pulseIn(echoPin, HIGH, 5000);
 
             if(duration == 0){
-            duration = 100000000000; //Absurdley large number to make next calculation very large 
+                //Absurdley large number to make next calculation very large. Method getDistance() will then return a large number to indicate that no echo was heard.
+                duration = 100000000000; 
             }
             float distance = duration * 0.034 / 2;
             Serial.println(distance);
