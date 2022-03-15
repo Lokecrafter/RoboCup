@@ -1,5 +1,5 @@
 const byte numPhotoResistors = 10;
-const int photoResistors[] = {A8, A9, A0, A1, A2, A3, A4, A5, A7, A6};
+const int photoResistors[] = {A0, A1, A2, A3, A4, A5, A6, A7, A8, A9};
 int baseValues[] = {287,261,225,390,271,475,470,252,289,175};
 int finValues[]  = {515,420,300,571,415,698,612,342,480,319};
 

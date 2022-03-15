@@ -34,7 +34,11 @@ class LineFinder {
             delete [] photoAngles;
             photoAngles = newAngles;
             for(int i = 0; i < numPhotoResistors; i++){
+                Serial.print("        Setting angle degrees: ");
+                Serial.print(photoAngles[i].angle);
                 photoAngles[i].angle *= PI / 180;
+                Serial.print("Setting angle radians: ");
+                Serial.println(photoAngles[i].angle);
             }
         }
 
