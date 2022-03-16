@@ -17,11 +17,15 @@ int photoResistors[] = {A0, A1, A2, A3, A4, A5, A6, A7, A8, A9};
 int whiteValues[] = {284,195,213,255,200,265,334,314,335,250};
 int blackValues[] = {694,425,408,490,321,498,576,322,399,390};
 */
-
+/*
 //Robot 2
 int whiteValues[] = {150,142,136,145,131,133,163,131,135,177};
 int blackValues[] = {170,160,154,160,150,150,183,150,155,194};
-
+*/
+//Robot 2 with protected lights
+int blackAdd = 25;
+int whiteValues[] = {160, 167, 159, 165, 151, 155, 194, 161, 170, 198};
+int blackValues[] = {170, 160, 154, 160, 150, 150, 183, 150, 155, 194};
 
 float avoidDistance = 5;
 
@@ -47,6 +51,11 @@ UltraSonicSensor distSens(TRIGPIN, ECHOPIN);
 void setup(){
     Serial.begin(9600);
 	Serial.println("Started!");
+
+	for(int i = 0; i < numPhotoResistors; i++){
+		blackValues[i] = whiteValues[i] + blackAdd;
+	}
+
 	lnFind.SetThreshold(followLineThreshold);
 	lnFind.SetBlackVals(blackValues);
 	lnFind.SetWhiteVals(whiteValues);
