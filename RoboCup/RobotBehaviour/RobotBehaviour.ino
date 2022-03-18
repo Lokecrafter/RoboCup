@@ -1,4 +1,4 @@
-#include<Servo.h>
+//#include<Servo.h>
 //#include"Vector.h"
 #include"RobotPeripherals.h"
 
@@ -25,7 +25,7 @@ int blackValues[] = {170,160,154,160,150,150,183,150,155,194};
 //Robot 2 with protected lights
 int blackAdd = 25;
 int whiteValues[] = {160, 167, 159, 165, 151, 155, 194, 161, 170, 198};
-int blackValues[] = {170, 160, 154, 160, 150, 150, 183, 150, 155, 194};
+int blackValues[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 float avoidDistance = 5;
 
@@ -44,13 +44,16 @@ VectorP photoAngles[] = {
 	VectorP(90 - 120, 1)
 };
 
-LineFinder lnFind(photoResistors, numPhotoResistors);
-MotorController mtrCtrl(SERVOPINL, SERVOPINR);
-UltraSonicSensor distSens(TRIGPIN, ECHOPIN);
+LineFinder lnFind;
+MotorController mtrCtrl;
+//UltraSonicSensor distSens(TRIGPIN, ECHOPIN);
 
 void setup(){
     Serial.begin(9600);
 	Serial.println("Started!");
+
+	lnFind.begin(photoResistors, numPhotoResistors);
+	mtrCtrl.begin(SERVOPINL, SERVOPINR);
 
 	for(int i = 0; i < numPhotoResistors; i++){
 		blackValues[i] = whiteValues[i] + blackAdd;
@@ -60,14 +63,10 @@ void setup(){
 	lnFind.SetBlackVals(blackValues);
 	lnFind.SetWhiteVals(whiteValues);
 	lnFind.SetAngles(photoAngles);
-	Vector2 vect(0,0);
-	mtrCtrl.driveServos(vect,0);
+
 
 
     pinMode(ENABLEPIN, INPUT_PULLUP);
-    pinMode(TRIGPIN, OUTPUT);
-    pinMode(ECHOPIN, INPUT);
-
 }
 
 

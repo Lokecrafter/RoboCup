@@ -44,7 +44,7 @@ class LineFinder {
 
         //Constructor & Destructor
         //Instantiate linefinder with pins to use and the amount of pins
-        LineFinder(int* photoResistorPins, int numPins){
+        void begin(int* photoResistorPins, int numPins){
             SetPhotoResistors(photoResistorPins);
             SetNumPhotoResistors(numPins);
         }
@@ -129,7 +129,7 @@ class MotorController{
             return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
         }
     public:
-        MotorController(int leftServoPin, int rightServoPin){
+        void begin(int leftServoPin, int rightServoPin){
             servoLeft.attach(leftServoPin);
             servoRight.attach(rightServoPin);
             servoLeft.write(90);
