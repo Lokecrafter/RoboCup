@@ -57,7 +57,7 @@ class VectorP
             return VectorP(angle, length / factor);
         }
         Vector2 ToVector2(){
-            return Vector2(cos(angle), sin(angle)) * length;
+            return Vector2(cos(angle * PI / 180), sin(angle * PI / 180)) * length;
         }
 
         void normalize(){

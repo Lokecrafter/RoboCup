@@ -31,16 +31,16 @@ float avoidDistance = 5;
 
 VectorP photoAngles[] = {
 	VectorP(90 + 120, 1),
-	VectorP(90 + 90, 1),
+	VectorP(90 + 80, 1),
 
+	VectorP(90 + 50, 1),
 	VectorP(90 + 15, 1),
-	VectorP(90 + 10, 1),
 	VectorP(90 + 5, 1),
 	VectorP(90 - 5, 1),
-	VectorP(90 - 10, 1),
 	VectorP(90 - 15, 1),
+	VectorP(90 - 50, 1),
 	
-	VectorP(90 - 90, 1),
+	VectorP(90 - 80, 1),
 	VectorP(90 - 120, 1)
 };
 

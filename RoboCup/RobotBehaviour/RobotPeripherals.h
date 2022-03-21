@@ -36,9 +36,6 @@ class LineFinder {
             for(int i = 0; i < numPhotoResistors; i++){
                 Serial.print("        Setting angle degrees: ");
                 Serial.print(photoAngles[i].angle);
-                photoAngles[i].angle *= PI / 180;
-                Serial.print("Setting angle radians: ");
-                Serial.println(photoAngles[i].angle);
             }
         }
 
@@ -75,6 +72,9 @@ class LineFinder {
             }
             //Return the vector pointing straight forward if none of photo resistors are black enough
             if(maxVal <= threshold) return VectorP(PI * 0.5,1);
+            
+            //Breakpoiiiiiiint tho stop checking for averageeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+            return photoAngles[index];
 
             //Calculate neighbour average
             float avrgAngle = 0;
@@ -140,7 +140,7 @@ class MotorController{
             vect.x = clamp(vect.x, -1, 1);
             vect.y = clamp(vect.y, -1, 1);
 
-            vect = vect * (speedMultiplier);
+            vect = vect * speedMultiplier;
 
             //Only when using a controller
             //if(vect.y < 0)  vect.y = vect.y * -1; //Handles steering so it feels natural when robot is reversing. With this if-statement it simulates how a car would steer when reversing
