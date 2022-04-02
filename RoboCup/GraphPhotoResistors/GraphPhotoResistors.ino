@@ -21,7 +21,8 @@ void loop (){
     Serial.print("(");
     Serial.print(finValues[i] - baseValues[i]);
     Serial.print(")");
-    Serial.print(mappedVal);*/
+    Serial.print(mappedVal);
+    */
     Serial.print(val);
     Serial.print("   ");
     

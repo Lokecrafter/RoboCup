@@ -1,80 +1,96 @@
 #include<Arduino.h>
 #include"Vector.h"
+#include"global.h"
+
+//Prevent multiple definitions
+#ifndef ROBOT_PERIPHERALS_H
+#define ROBOT_PERIPHERALS_H
+
+
+//Global useful methods
+float clamp(float val, float minVal, float maxVal){
+    val = max(val, minVal);
+    val = min(val, maxVal);
+    return(val);
+}
+float floatMap(float x, float in_min, float in_max, float out_min, float out_max) {
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+class PhotoResistor {
+    private:
+        int whiteVal;
+        int blackVal;
+    public:
+        int pin;
+        Vector2 position;
+        void setWhiteBlackVals(int newWhiteVal, int newBlackVal){
+            whiteVal = newWhiteVal;
+            blackVal = newBlackVal;
+        }
+        //Default constructor
+        PhotoResistor(){
+
+        }
+
+        float getLight(){
+            float val = analogRead(pin);
+            return floatMap(val, whiteVal, blackVal, 0, 1);
+        }
+};
+
+
 class LineFinder {
     private:
-        int* photoResistors;
+        PhotoResistor* photoResistors;
         int numPhotoResistors;
 
-        int* whiteVals;
-        int* blackVals;
-        VectorP* photoAngles;
-
         float threshold = 0;
-
-        float floatMap(float x, float in_min, float in_max, float out_min, float out_max) {
-            return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-        }
     public:
         //Setters
         void SetNumPhotoResistors(int newNum){numPhotoResistors = newNum;}
         void SetThreshold(float newThreshold){threshold = newThreshold;}
-        void SetPhotoResistors(int* newPins){
-            //delete [] photoResistors;
-            photoResistors = newPins;
-        }
-        void SetWhiteVals(int* newVals){
-            delete [] whiteVals;
-            whiteVals = newVals;
-        }
-        void SetBlackVals(int* newVals){
-            delete [] blackVals;
-            blackVals = newVals;
-        }
-        void SetAngles(VectorP* newAngles){ //Give angles in degrees
-            delete [] photoAngles;
-            photoAngles = newAngles;
+        void SetPhotoResistors(int* newPins, Vector2* newPositions, int* newWhiteVals, int* newBlackVals){
+            delete [] photoResistors;
+            photoResistors = new PhotoResistor[numPhotoResistors];
+
             for(int i = 0; i < numPhotoResistors; i++){
-                Serial.print("        Setting angle degrees: ");
-                Serial.print(photoAngles[i].angle);
+                photoResistors[i].pin = newPins[i];
+                photoResistors[i].position = newPositions[i];
+                photoResistors[i].setWhiteBlackVals(newWhiteVals[i], newBlackVals[i]);
             }
         }
-
         //Constructor & Destructor
         //Instantiate linefinder with pins to use and the amount of pins
-        void begin(int* photoResistorPins, int numPins){
-            SetPhotoResistors(photoResistorPins);
+        void begin(int numPins, int* photoResistorPins, Vector2* photoPositions, int* whiteValues, int* blackValues){
             SetNumPhotoResistors(numPins);
+            SetPhotoResistors(photoResistorPins, photoPositions, whiteValues, blackValues);
         }
         ~LineFinder(){
             //Free memory and give back to OS
             delete [] photoResistors;
-            delete [] whiteVals;
-            delete [] blackVals;
-            delete [] photoAngles;
-
             photoResistors = nullptr;
-            whiteVals = nullptr;
-            blackVals = nullptr;
-            photoAngles = nullptr;
         }
+
+
+
         //Methods
-        VectorP calcLineMiddle(){
+        VectorP getLine(){                                                           
             int index = 0;
             float maxVal = 0;
             //Find max value
             for(byte i = 0; i < numPhotoResistors; i++){
-                float val = (float)analogRead(photoResistors[i]);
-                val = floatMap(val, whiteVals[i], blackVals[i], 0, 1);
+                float val = photoResistors[i].getLight();
                 if(maxVal < val){
                     maxVal = val;
                     index = i;
                 }
             }
             //Return the vector pointing straight forward if none of photo resistors are black enough
-            if(maxVal <= threshold) return VectorP(PI * 0.5,1);
+            if(maxVal <= threshold) return VectorP(PI * 0.5 - (OFFSETANGLE * PI / 180) + 16 * PI,1);
             
             //Breakpoiiiiiiint tho stop checking for averageeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
-            return photoAngles[index];
+            //return photoResistors[index].position;
 
             //Calculate neighbour average
             float avrgAngle = 0;
@@ -82,25 +98,22 @@ class LineFinder {
             for(int i = index - 1; i < index + 2; i++){
                 //Handles exeptions when i is outide of array. Currently it adds the closest index inside the array to the total average angle
                 if(i < 0){
-                    float val = (float)analogRead(photoResistors[0]);
-                    val = floatMap(val, whiteVals[0], blackVals[0], 0, 1);
+                    float val = photoResistors[0].getLight();
                     sumValues += val;
-
-                    avrgAngle += photoAngles[0].angle * val;
+                    VectorP polVect = photoResistors[0].position;
+                    avrgAngle += polVect.angle * val;
                 }
                 else if(i > numPhotoResistors - 1){
-                    float val = (float)analogRead(photoResistors[numPhotoResistors - 1]);
-                    val = floatMap(val, whiteVals[numPhotoResistors - 1], blackVals[numPhotoResistors - 1], 0, 1);
+                    float val = photoResistors[numPhotoResistors - 1].getLight();
                     sumValues += val;
-
-                    avrgAngle += photoAngles[numPhotoResistors - 1].angle;
+                    VectorP polVect = photoResistors[numPhotoResistors - 1].position;
+                    avrgAngle += polVect.angle * val;                    
                 }
                 else{
-                    float val = (float)analogRead(photoResistors[i]);
-                    val = floatMap(val, whiteVals[i], blackVals[i], 0, 1);
-                    sumValues += val * val;
-
-                    avrgAngle += photoAngles[i].angle * val;
+                    float val = photoResistors[i].getLight();
+                    sumValues += val;
+                    VectorP polVect = photoResistors[i].position;
+                    avrgAngle += polVect.angle * val;                
                 }
             }
             avrgAngle /= sumValues; //Definition for center of mass equation, exept this time it's a center of value equation
@@ -110,24 +123,12 @@ class LineFinder {
 
 
 
-
-
-
-
 #include<Servo.h>
-class MotorController{
+class ServoController{
     private:
         Servo servoLeft;
         Servo servoRight;
 
-        float clamp(float val, float minVal, float maxVal){
-            val = max(val, minVal);
-            val = min(val, maxVal);
-            return(val);
-        }
-        float floatMap(float x, float in_min, float in_max, float out_min, float out_max) {
-            return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-        }
     public:
         void begin(int leftServoPin, int rightServoPin){
             servoLeft.attach(leftServoPin);
@@ -136,14 +137,17 @@ class MotorController{
             servoRight.write(90);
         }
 
-        void driveServos(Vector2 &vect, float speedMultiplier){
+
+        //Vect is a joystick input where y-axis determines forward and backwardsspeed and x-axis determines turn rate   
+        //Additonal notes:
+            //When using an actual controller. Add this to your code:
+            //if(vect.y < 0)  vect.y = vect.y * -1; 
+            //It inverts steering when reversinng. It simulates how a car would steer when reversing
+        void drive(Vector2 &vect, float speedMultiplier){
             vect.x = clamp(vect.x, -1, 1);
             vect.y = clamp(vect.y, -1, 1);
 
             vect = vect * speedMultiplier;
-
-            //Only when using a controller
-            //if(vect.y < 0)  vect.y = vect.y * -1; //Handles steering so it feels natural when robot is reversing. With this if-statement it simulates how a car would steer when reversing
 
             float leftPercentage = vect.y + vect.x;
             float rightPercentage = vect.y - vect.x;
@@ -159,6 +163,14 @@ class MotorController{
 };
 
 
+class CrossroadBias{
+    private:
+
+    public:
+        CrossroadBias(){
+
+        }
+};
 
 
 class UltraSonicSensor{
@@ -169,6 +181,9 @@ class UltraSonicSensor{
         UltraSonicSensor(int newTrigPin, int newEchoPin){
             trigPin = newTrigPin;
             echoPin = newEchoPin;
+
+            pinMode(trigPin, OUTPUT);
+            pinMode(echoPin, INPUT);
         }
 
         float getDistance(){
@@ -190,3 +205,68 @@ class UltraSonicSensor{
             return distance;
         }
 };
+
+
+class BallPickup{
+    private: 
+        Servo tilt;
+        Servo grip;
+
+        int startTilt;
+        int startGrip;
+        int endTilt;
+        int endGrip;
+    public:
+        void PositionManually();
+        void begin(int newTiltPin, int newClawPin, int startTiltAngle = 125, int startGripAngle = 40, int endTiltAngle = 30, int endGripAngle = 180){
+            tilt.attach(newTiltPin);
+            grip.attach(newClawPin);
+
+            SetStartAngles(startTiltAngle, startGripAngle);
+            SetEndAngles(endTiltAngle, endGripAngle);
+
+            PositionManually(0,0);
+        }
+        void SetStartAngles(int tiltAngle, int gripAngle){
+            startTilt = tiltAngle;
+            startGrip = gripAngle;
+        }
+        void SetEndAngles(int tiltAngle, int gripAngle){
+            endTilt = tiltAngle;
+            endGrip = gripAngle;
+        }
+
+
+        void PositionManually(float tiltPercentage, float gripPercentage){
+            tilt.write(round(floatMap(
+                tiltPercentage, 0, 1, startTilt, endTilt
+            )));
+            grip.write(round(floatMap(
+                gripPercentage, 0, 1, startGrip, endGrip
+            )));
+        }
+        void PickUp(){
+            PositionManually(0, 1);
+            delay(500);
+            PositionManually(1, 1);
+            delay(1000);
+            PositionManually(1, 0.2);
+            delay(500);
+            PositionManually(0, 0);
+        }
+        void open(){
+            PositionManually(0, 1);
+            delay(500);
+            PositionManually(1, 1);
+            delay(1000);
+        }
+        void close(){
+            PositionManually(1, 0.2);
+            delay(500);
+            PositionManually(0, 0);
+            delay(1000);
+        }
+};
+
+
+#endif

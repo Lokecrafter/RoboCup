@@ -1,4 +1,36 @@
 #include<Arduino.h>
+
+//Prevent multiple definitions
+#ifndef VECTOR_H
+#define VECTOR_H
+
+class VectorP;
+class Vector2;
+
+class VectorP
+{
+    public:
+        float angle = 0;
+        float length = 0;
+
+        VectorP(float newAngle, float newLength){
+            angle = newAngle;
+            length = newLength;
+        }
+        VectorP operator * (float const &factor) {
+            return VectorP(angle, length * factor);
+        }
+        VectorP operator / (float const &factor) {
+            return VectorP(angle, length / factor);
+        }
+
+
+        void normalize(){
+            length = 1;
+        }
+
+        operator Vector2();
+};
 class Vector2
 {
     public:
@@ -8,6 +40,9 @@ class Vector2
         Vector2(float newX, float newY){
             x = newX;
             y = newY;
+        }
+        Vector2(){
+            
         }
         Vector2 operator + (Vector2 const &obj) {
             Vector2 vect(0,0);
@@ -39,28 +74,25 @@ class Vector2
             x /= length;
             y /= length;
         }
+
+        operator VectorP();
 };
-class VectorP
+
+VectorP::operator Vector2()
 {
-    public:
-        float angle = 0;
-        float length = 0;
+  Vector2 obj(0,0);
+  obj.y = sin(angle) * length;
+  obj.x = cos(angle) * length;
+  return obj;   
+}
 
-        VectorP(float newAngle, float newLength){
-            angle = newAngle;
-            length = newLength;
-        }
-        VectorP operator * (float const &factor) {
-            return VectorP(angle, length * factor);
-        }
-        VectorP operator / (float const &factor) {
-            return VectorP(angle, length / factor);
-        }
-        Vector2 ToVector2(){
-            return Vector2(cos(angle * PI / 180), sin(angle * PI / 180)) * length;
-        }
+Vector2::operator VectorP()
+{
+  VectorP obj(0,0);
+  obj.length = sqrt(x*x+y*y);
+  obj.angle = atan2(y, x);
+  return obj;
+   
+}
 
-        void normalize(){
-            length = 1;
-        }
-};
+#endif
