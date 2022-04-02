@@ -26,8 +26,15 @@ int photoResistors[] = {A0, A1, A2, A3, A4, A5, A6, A7, A8, A9};
 //int blackAdd = 25;
 //int whiteValues[] = {160, 167, 159, 165, 151, 155, 194, 161, 170, 198};
 //int blackValues[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+//int whiteValues[] = {251, 229, 206, 198, 190, 191, 235, 207, 225, 277};
+//int blackValues[] = {293, 261, 228, 214, 205, 207, 268, 264, 320, 403};
+//int whiteValues[] = {251, 229, 206, 198, 190, 191, 235, 207, 225, 277};
+//int blackValues[] = {293, 261, 228, 214, 205, 207, 268, 237, 250, 300};
+//int whiteValues[] = {251, 229, 206, 198, 190, 191, 235, 207, 225, 277};
+//int blackValues[] = {270, 261, 235, 220, 210, 207, 258, 237, 250, 300};
+
 int whiteValues[] = {251, 229, 206, 198, 190, 191, 235, 207, 225, 277};
-int blackValues[] = {293, 261, 228, 214, 205, 207, 268, 264, 320, 403};
+int blackValues[] = {290, 261, 235, 220, 210, 207, 258, 247, 260, 310};
 
 float avoidDistance = 5;
 
@@ -173,7 +180,7 @@ void loop(){
 	}
 
     vect = (Vector2)lineDir;
-    vect.x = vect.x * -1;
+    vect.x *= -1;
     Serial.print(vect.x);
     Serial.print(", ");
     Serial.println(vect.y);
