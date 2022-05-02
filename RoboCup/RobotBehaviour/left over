@@ -13,6 +13,27 @@
 //int blackValues[] = {290, 261, 235, 220, 210, 207, 258, 247, 260, 310};
 
 
+
+bool isWhite = false;
+unsigned long whiteStartTime = 0;
+unsigned long maxTimeAllowed = 3000;
+
+if(lineDir.angle >= 8 * PI){
+		if(isWhite){
+			if(millis() >= whiteStartTime + maxTimeAllowed){
+				resqueZone();
+			}
+		}
+		else{
+			whiteStartTime = millis();
+		}
+		isWhite = true;
+	}
+	else{
+		isWhite = false;
+	}
+
+
 void left(){
 	float a = (OFFSETANGLE * PI / 180);
 	VectorP direction = VectorP(0, 1);

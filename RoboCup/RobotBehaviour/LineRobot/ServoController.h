@@ -18,13 +18,30 @@ class ServoController{
             servoRight.write(90);
         }
 
-
-        //Vect is a joystick input where y-axis determines forward and backwardsspeed and x-axis determines turn rate   
-        //Additonal notes:
-            //When using an actual controller. Add this to your code:
-            //if(vect.y < 0)  vect.y = vect.y * -1; 
-            //It inverts steering when reversinng. It simulates how a car would steer when reversing
+        //vect - joystick input as a cartesian 2D-vector
+        //speedMultiplier - speed multiplier between 0 and 1
         void drive(Vector2 &vect, float speedMultiplier){
+            vect.x = clamp(vect.x, -1, 1);
+            vect.y = clamp(vect.y, -1, 1);
+
+            vect = vect * speedMultiplier;
+
+            float leftPercentage = vect.y + vect.x;
+            float rightPercentage = vect.y - vect.x;
+            leftPercentage = clamp(leftPercentage, -1, 1);
+            rightPercentage = clamp(rightPercentage, -1, 1);
+
+            int right = floatMap(leftPercentage, -1, 1, 180, 0);
+            int left = floatMap(rightPercentage, -1, 1, 0, 180);
+
+            servoLeft.write(left);
+            servoRight.write(right);
+        }
+        //ploVect - joystick input as a polar 2D-vector in terms of distance and degrees
+        //speedMultiplier - speed multiplier between 0 and 1
+        void drive(VectorP &polVect, float speedMultiplier){
+            polVect.toDegrees();
+            Vector2 vect = (Vector2)polVect;
             vect.x = clamp(vect.x, -1, 1);
             vect.y = clamp(vect.y, -1, 1);
 

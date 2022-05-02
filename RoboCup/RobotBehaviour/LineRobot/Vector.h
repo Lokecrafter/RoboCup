@@ -25,8 +25,20 @@ class VectorP
         }
 
 
-        void normalize(){
+        VectorP normalized(){
+            VectorP vect(angle,length);
             length = 1;
+            return vect;
+        }
+        VectorP toRadians(){
+            VectorP vect(angle,length);
+            vect.angle *= PI/180;
+            return vect;
+        }
+        VectorP toDegrees(){
+            VectorP vect(angle,length);
+            vect.angle *= 180/PI;
+            return vect;
         }
 
         operator Vector2();
@@ -69,10 +81,12 @@ class Vector2
             return vect;
         }
 
-        void normalize(){
+        Vector2 normalized(){
+            Vector2 vect(x,y);
             float length = sqrt(x*x + y*y);
-            x /= length;
-            y /= length;
+            vect.x /= length;
+            vect.y /= length;
+            return vect;
         }
 
         operator VectorP();

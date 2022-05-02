@@ -71,13 +71,6 @@ void setup(){
 	pickup.close();
 }
 
-
-
-
-bool isWhite = false;
-unsigned long whiteStartTime = 0;
-unsigned long maxTimeAllowed = 3000;
-
 void loop(){
 	Vector2 vect(0,0);
 
@@ -86,45 +79,11 @@ void loop(){
         return;
     }
 
-	VectorP lineDir = lnFind.getLine();
-	if(lineDir.angle >= 8 * PI){
-		if(isWhite){
-			if(millis() >= whiteStartTime + maxTimeAllowed){
-				resqueZone();
-			}
-		}
-		else{
-			whiteStartTime = millis();
-		}
-		isWhite = true;
-	}
-	else{
-		isWhite = false;
-	}
-
+	VectorP lineDir = lnFind.getLineAng();
+	
     vect = (Vector2)lineDir;
-    vect.x *= -1;
-    Serial.print(vect.x);
-    Serial.print(", ");
-    Serial.println(vect.y);
-
-
-    if(digitalRead(SWITCHOBSTACLE) == HIGH) {
-		//pickup.PickUp();
-		goAround();
-    }
-
-	vect.y *= -1;
+    vect = vect * -1;
     mtrCtrl.drive(vect, 0.15);
-
-}
-
-//Enable resqueZone mode and never return. Will continue forever
-void resqueZone(){
-	while (true)
-	{
-		resqueUpdate();
-	}
 }
 
 
